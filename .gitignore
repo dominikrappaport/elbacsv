@@ -14,3 +14,7 @@ wheels/
 
 # MAC related files
 .DS_Store
+
+# CSV data files
+
+*.csv
