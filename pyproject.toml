@@ -1,0 +1,16 @@
+[project]
+name = "elbacsv"
+version = "0.1.0"
+description = "Takes CSV files from the ELBA electronic banking application and brings it into first normal form"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+authors = [
+  { name="Dominik Rappaport", email="dominik@rappaport.at" },
+]
+license = "MIT"
+license-files = ["LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/dominikrappaport/elbacsv"
+Issues = "https://github.com/dominikrappaport/elbacsv/issues"
