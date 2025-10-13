@@ -55,6 +55,8 @@ def parse_command_line_args():
 
     parser.add_argument("output_csv", help="Path to the output CSV file.")
 
+    parser.add_argument("--merge", help="Merge 'Zahlungsreferenz' and 'Verwendungszweck'", action="store_true")
+
     return parser.parse_args()
 
 
@@ -106,7 +108,7 @@ def strip_zwnbsp(x):
     return x.replace("\ufeff", "") if isinstance(x, str) else x
 
 
-def process_csv_file(input_csv, output_csv):
+def process_csv_file(input_csv, output_csv, merge=False):
     """
     Process an ELBA CSV file and write parsed results to a new CSV file.
 
@@ -117,6 +119,7 @@ def process_csv_file(input_csv, output_csv):
     Args:
         input_csv: Path to the input CSV file to be processed.
         output_csv: Path to the output CSV file where results will be written.
+        merge: If True, merge 'Zahlungsreferenz' and 'Verwendungszweck' columns.
 
     Note:
         The function assumes the second column (index 1) contains the structured
@@ -159,7 +162,7 @@ def main():
     """
     args = parse_command_line_args()
 
-    process_csv_file(args.input_csv, args.output_csv)
+    process_csv_file(args.input_csv, args.output_csv, args.merge)
 
 
 if __name__ == "__main__":
