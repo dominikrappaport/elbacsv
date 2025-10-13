@@ -131,7 +131,7 @@ def process_csv_file(input_csv, output_csv):
         rows = list(reader)
 
     second_col_index = 1
-    new_header = ["Datum1", *KEYS, "Datum2", "Betrag", "Währung", "Zeitstempel"]
+    new_header = ["Durchführungsdatum", *KEYS, "Valutadatum", "Betrag", "Währung", "Zeitstempel"]
 
     new_rows = []
     for row in rows:
