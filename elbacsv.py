@@ -2,44 +2,40 @@ import csv
 import argparse
 import re
 
-
 KEYS = [
-    "Zahlungsreferenz",
-    "Verwendungszweck",
     "Kartenzahlung mit Kartenfolge-Nr.",
-    "IBAN Empfänger",
-    "BIC Empfänger",
-    "IBAN Auftraggeber",
-    "BIC Auftraggeber",
+    "Urspr. Zahlungspflichtigenkennung",
+    "IBAN Transaktionsteilnehmer",
+    "Zahlungspflichtigenkennung",
+    "BIC Transaktionsteilnehmer",
+    "Urspr. Zahlungspflichtige",
     "IBAN Zahlungsempfänger",
     "BIC Zahlungsempfänger",
-    "Empfänger-Kennung",
     "Auftraggeberreferenz",
-    "Mandat",
-    "Empfänger",
-    "MandatsID",
-    "CreditorID",
-    "Entgeltzeile",
+    "IBAN Auftraggeber",
+    "Empfänger-Kennung",
+    "Zahlungsreferenz",
+    "Verwendungszweck",
+    "BIC Auftraggeber",
+    "Urspr. Empfänger",
     "Originalbetrag",
-    "Urspr. Zahlungspflichtige",
-    "Urspr. Zahlungspflichtigenkennung",
-    "Zahlungspflichtigenkennung", # TODO: Change code so it makes key detection greedy
+    "IBAN Empfänger",
+    "BIC Empfänger",
+    "Entgeltzeile",
+    "Auftraggeber",
+    "Empfänger",
+    "Mandat",
 ]
+
 
 def parse_command_line_args():
     parser = argparse.ArgumentParser(
         description="Process an ELBA-generated CSV file and write results to an output CSV file."
     )
 
-    parser.add_argument(
-        "input_csv",
-        help="Path to the input CSV file."
-    )
+    parser.add_argument("input_csv", help="Path to the input CSV file.")
 
-    parser.add_argument(
-        "output_csv",
-        help="Path to the output CSV file."
-    )
+    parser.add_argument("output_csv", help="Path to the output CSV file.")
 
     return parser.parse_args()
 
@@ -48,10 +44,8 @@ def parse_key_value_string(s: str):
     """Parse a string into a dict of key: value pairs based on the given list of keys."""
     result = {k: "" for k in KEYS}
 
-    # Sort keys by length descending (avoid partial matches)
-    keys_sorted = sorted(KEYS, key=len, reverse=True)
     # Build regex: (Key1|Key2|Key3):
-    pattern = r"(" + "|".join(map(re.escape, keys_sorted)) + r")\s*:\s*"
+    pattern = r"(" + "|".join(map(re.escape, KEYS)) + r")\s*:\s*"
     parts = re.split(pattern, s)
 
     it = iter(parts[1:])  # skip text before first key
@@ -75,7 +69,11 @@ def process_csv_file(input_csv, output_csv):
     new_rows = []
     for row in rows:
         kv_dict = parse_key_value_string(row[second_col_index])
-        new_row = row[:second_col_index] + [kv_dict[k] for k in KEYS] + row[second_col_index + 1:]
+        new_row = (
+            row[:second_col_index]
+            + [kv_dict[k] for k in KEYS]
+            + row[second_col_index + 1 :]
+        )
         new_rows.append(new_row)
 
     with open(output_csv, "w", newline="", encoding="utf-8") as f:

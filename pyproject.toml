@@ -14,3 +14,8 @@ license-files = ["LICENSE"]
 [project.urls]
 Homepage = "https://github.com/dominikrappaport/elbacsv"
 Issues = "https://github.com/dominikrappaport/elbacsv/issues"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]
