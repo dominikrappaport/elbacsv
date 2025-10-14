@@ -130,8 +130,6 @@ def process_csv_file(input_csv, output_csv, merge=False):
         data to be parsed. All other columns are preserved in their original positions.
 
     """
-    # TODO(dominik): Implement merge option
-    # https://github.com/dominikrappaport/elbacsv/issues/2
     with open(input_csv, newline="", encoding="utf-8") as f:
         sample = f.read(1024)
         dialect = csv.Sniffer().sniff(sample)
@@ -156,12 +154,31 @@ def process_csv_file(input_csv, output_csv, merge=False):
     new_rows = []
     for row in rows:
         row_data = parse_key_value_string(row[second_col_index])
+
+        # If merge is True, combine Zahlungsreferenz and Verwendungszweck
+        if merge:
+            zahlungsreferenz = row_data["Zahlungsreferenz"].strip()
+            verwendungszweck = row_data["Verwendungszweck"].strip()
+
+            # Merge the two fields (only add space if both are non-empty)
+            if zahlungsreferenz and verwendungszweck:
+                row_data["Verwendungszweck"] = f"{zahlungsreferenz} {verwendungszweck}"
+            elif zahlungsreferenz:
+                row_data["Verwendungszweck"] = zahlungsreferenz
+            # If only verwendungszweck exists, it stays as is
+
+            # If merge is True, remove 'Zahlungsreferenz' from sorted_keys
+            sorted_keys = [k for k in sorted_keys if k != "Zahlungsreferenz"]
+
         new_row = (
             row[:second_col_index]
             + [row_data[k] for k in sorted_keys]
             + row[second_col_index + 1 :]
         )
         new_rows.append(new_row)
+
+    if merge:
+        new_header.remove("Zahlungsreferenz")
 
     with open(output_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, dialect)
