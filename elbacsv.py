@@ -13,8 +13,6 @@ import argparse
 import csv
 import re
 
-# TODO(dominik): Change to dictionary and add sorting order as value
-# https://github.com/dominikrappaport/elbacsv/issues/1
 KEYS = {
     "Kartenzahlung mit Kartenfolge-Nr.": 4,
     "Urspr. Zahlungspflichtigenkennung": 17,
@@ -57,7 +55,11 @@ def parse_command_line_args():
 
     parser.add_argument("output_csv", help="Path to the output CSV file.")
 
-    parser.add_argument("--merge", help="Merge 'Zahlungsreferenz' and 'Verwendungszweck'", action="store_true")
+    parser.add_argument(
+        "--merge",
+        help="Merge 'Zahlungsreferenz' and 'Verwendungszweck'",
+        action="store_true",
+    )
 
     return parser.parse_args()
 
@@ -142,7 +144,14 @@ def process_csv_file(input_csv, output_csv, merge=False):
     # Sort keys by their values in the KEYS dictionary
     sorted_keys = sorted(KEYS.keys(), key=lambda k: KEYS[k])
 
-    new_header = ["Durchführungsdatum", *list(sorted_keys), "Valutadatum", "Betrag", "Währung", "Zeitstempel"]
+    new_header = [
+        "Durchführungsdatum",
+        *list(sorted_keys),
+        "Valutadatum",
+        "Betrag",
+        "Währung",
+        "Zeitstempel",
+    ]
 
     new_rows = []
     for row in rows:
