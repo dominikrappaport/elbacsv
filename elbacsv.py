@@ -13,30 +13,32 @@ import argparse
 import csv
 import re
 
-KEYS = [
-    "Kartenzahlung mit Kartenfolge-Nr.",
-    "Urspr. Zahlungspflichtigenkennung",
-    "IBAN Transaktionsteilnehmer",
-    "Zahlungspflichtigenkennung",
-    "BIC Transaktionsteilnehmer",
-    "Urspr. Zahlungspflichtige",
-    "IBAN Zahlungsempfänger",
-    "BIC Zahlungsempfänger",
-    "Auftraggeberreferenz",
-    "IBAN Auftraggeber",
-    "Empfänger-Kennung",
-    "Zahlungsreferenz",
-    "Verwendungszweck",
-    "BIC Auftraggeber",
-    "Urspr. Empfänger",
-    "Originalbetrag",
-    "IBAN Empfänger",
-    "BIC Empfänger",
-    "Entgeltzeile",
-    "Auftraggeber",
-    "Empfänger",
-    "Mandat",
-]
+# TODO(dominik): Change to dictionary and add sorting order as value
+# https://github.com/dominikrappaport/elbacsv/issues/1
+KEYS = {
+    "Kartenzahlung mit Kartenfolge-Nr.": 4,
+    "Urspr. Zahlungspflichtigenkennung": 17,
+    "IBAN Transaktionsteilnehmer": 19,
+    "BIC Transaktionsteilnehmer": 20,
+    "IBAN Zahlungsempfänger": 9,
+    "BIC Zahlungsempfänger": 10,
+    "Urspr. Zahlungspflichtige": 16,
+    "Auftraggeberreferenz": 12,
+    "Zahlungspflichtigenkennung": 18,
+    "Empfänger-Kennung": 6,
+    "IBAN Auftraggeber": 13,
+    "BIC Auftraggeber": 14,
+    "IBAN Empfänger": 7,
+    "BIC Empfänger": 8,
+    "Verwendungszweck": 1,
+    "Zahlungsreferenz": 2,
+    "Originalbetrag": 21,
+    "Auftraggeber": 11,
+    "Urspr. Empfänger": 15,
+    "Entgeltzeile": 22,
+    "Empfänger": 5,
+    "Mandat": 3,
+}
 
 
 def parse_command_line_args():
@@ -80,10 +82,10 @@ def parse_key_value_string(s):
         {'Empfänger': 'John Doe', 'Betrag': '100', ...}
 
     """
-    result = dict.fromkeys(KEYS, "")
+    result = dict.fromkeys(KEYS.keys(), "")
 
     # Build regex: (Key1|Key2|Key3):
-    pattern = r"(" + "|".join(map(re.escape, KEYS)) + r")\s*:\s*"
+    pattern = r"(" + "|".join(map(re.escape, KEYS.keys())) + r")\s*:\s*"
     parts = re.split(pattern, s)
 
     it = iter(parts[1:])  # skip text before first key
@@ -126,6 +128,8 @@ def process_csv_file(input_csv, output_csv, merge=False):
         data to be parsed. All other columns are preserved in their original positions.
 
     """
+    # TODO(dominik): Implement merge option
+    # https://github.com/dominikrappaport/elbacsv/issues/2
     with open(input_csv, newline="", encoding="utf-8") as f:
         sample = f.read(1024)
         dialect = csv.Sniffer().sniff(sample)
@@ -134,14 +138,18 @@ def process_csv_file(input_csv, output_csv, merge=False):
         rows = list(reader)
 
     second_col_index = 1
-    new_header = ["Durchführungsdatum", *KEYS, "Valutadatum", "Betrag", "Währung", "Zeitstempel"]
+
+    # Sort keys by their values in the KEYS dictionary
+    sorted_keys = sorted(KEYS.keys(), key=lambda k: KEYS[k])
+
+    new_header = ["Durchführungsdatum", *list(sorted_keys), "Valutadatum", "Betrag", "Währung", "Zeitstempel"]
 
     new_rows = []
     for row in rows:
-        kv_dict = parse_key_value_string(row[second_col_index])
+        row_data = parse_key_value_string(row[second_col_index])
         new_row = (
             row[:second_col_index]
-            + [kv_dict[k] for k in KEYS]
+            + [row_data[k] for k in sorted_keys]
             + row[second_col_index + 1 :]
         )
         new_rows.append(new_row)
