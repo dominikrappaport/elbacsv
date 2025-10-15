@@ -112,7 +112,7 @@ def strip_zwnbsp(x):
     return x.replace("\ufeff", "") if isinstance(x, str) else x
 
 
-def process_csv_file(input_csv, output_csv, merge=False):
+def process_csv_file(input_csv, output_csv, merge):
     """
     Process an ELBA CSV file and write parsed results to a new CSV file.
 
