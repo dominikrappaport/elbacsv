@@ -45,3 +45,11 @@ These steps assume you are using [uv](https://github.com/astral-sh/uv) as your p
 
 ## Usage
 
+Download the CSV file from your bank account and run the following command:
+
+```bash
+uv run elbacsv.py input.csv output.csv
+```
+
+You may add the option `--merge`. This will merge the two keys `Verwendungszweck` and `Zahlungsreferenz` 
+into a single field `Verwendungszweck`.
