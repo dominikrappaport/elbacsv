@@ -51,5 +51,5 @@ Download the CSV file from your bank account and run the following command:
 uv run elbacsv.py input.csv output.csv
 ```
 
-You may add the option `--merge`. This will merge the two keys `Verwendungszweck` and `Zahlungsreferenz` 
-into a single field `Verwendungszweck`.
+You may add the option `--merge`. This will merge the two keys `Verwendungszweck`, `Zahlungsreferenz` and 
+`Auftraggeberreferenz` into a single field `Verwendungszweck`.

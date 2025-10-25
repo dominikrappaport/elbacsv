@@ -57,7 +57,7 @@ def parse_command_line_args():
 
     parser.add_argument(
         "--merge",
-        help="Merge 'Zahlungsreferenz' and 'Verwendungszweck'",
+        help="Merge 'Zahlungsreferenz', 'Verwendungszweck' and 'Auftraggeberreferenz'",
         action="store_true",
     )
 
@@ -123,7 +123,7 @@ def process_csv_file(input_csv, output_csv, merge):
     Args:
         input_csv: Path to the input CSV file to be processed.
         output_csv: Path to the output CSV file where results will be written.
-        merge: If True, merge 'Zahlungsreferenz' and 'Verwendungszweck' columns.
+        merge: If True, merge 'Zahlungsreferenz', 'Verwendungszweck' and 'Auftraggeberreferenz' columns.
 
     Note:
         The function assumes the second column (index 1) contains the structured
@@ -155,20 +155,28 @@ def process_csv_file(input_csv, output_csv, merge):
     for row in rows:
         row_data = parse_key_value_string(row[second_col_index])
 
-        # If merge is True, combine Zahlungsreferenz and Verwendungszweck
+        # If merge is True, combine Zahlungsreferenz, Verwendungszweck and Auftraggeberreferenz
         if merge:
             zahlungsreferenz = row_data["Zahlungsreferenz"].strip()
             verwendungszweck = row_data["Verwendungszweck"].strip()
+            auftraggeberreferenz = row_data["Auftraggeberreferenz"].strip()
 
-            # Merge the two fields (only add space if both are non-empty)
-            if zahlungsreferenz and verwendungszweck:
-                row_data["Verwendungszweck"] = f"{zahlungsreferenz} {verwendungszweck}"
-            elif zahlungsreferenz:
-                row_data["Verwendungszweck"] = zahlungsreferenz
-            # If only verwendungszweck exists, it stays as is
+            # Collect all non-empty values
+            merged_parts = [
+                part
+                for part in [zahlungsreferenz, verwendungszweck, auftraggeberreferenz]
+                if part
+            ]
 
-            # If merge is True, remove 'Zahlungsreferenz' from sorted_keys
-            sorted_keys = [k for k in sorted_keys if k != "Zahlungsreferenz"]
+            # Merge the fields with space separation
+            row_data["Verwendungszweck"] = " ".join(merged_parts)
+
+            # If merge is True, remove 'Zahlungsreferenz' and 'Auftraggeberreferenz' from sorted_keys
+            sorted_keys = [
+                k
+                for k in sorted_keys
+                if k not in ["Zahlungsreferenz", "Auftraggeberreferenz"]
+            ]
 
         new_row = (
             row[:second_col_index]
@@ -179,6 +187,7 @@ def process_csv_file(input_csv, output_csv, merge):
 
     if merge:
         new_header.remove("Zahlungsreferenz")
+        new_header.remove("Auftraggeberreferenz")
 
     with open(output_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f, dialect)
