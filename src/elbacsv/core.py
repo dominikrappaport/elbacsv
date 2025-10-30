@@ -1,67 +1,14 @@
 """
-Parses ELBA CSV files and processes them for easier importing.
+Core business logic for ELBA CSV processing.
 
-This module reads CSV files exported from ELBA (Austrian banking software),
-extracts key-value pairs from a structured text column, and writes the parsed
-data to a new CSV file with expanded columns. This makes importing that data
-into applications like Excel or iFinance easier.
-
-Dominik Rappaport, dominik@rappaport.at
+This module contains the main parsing and processing functions
+for transforming ELBA CSV files into normalized format.
 """
 
-import argparse
 import csv
 import re
 
-KEYS = {
-    "Kartenzahlung mit Kartenfolge-Nr.": 4,
-    "Urspr. Zahlungspflichtigenkennung": 17,
-    "IBAN Transaktionsteilnehmer": 19,
-    "BIC Transaktionsteilnehmer": 20,
-    "IBAN Zahlungsempfänger": 9,
-    "BIC Zahlungsempfänger": 10,
-    "Urspr. Zahlungspflichtige": 16,
-    "Auftraggeberreferenz": 12,
-    "Zahlungspflichtigenkennung": 18,
-    "Empfänger-Kennung": 6,
-    "IBAN Auftraggeber": 13,
-    "BIC Auftraggeber": 14,
-    "IBAN Empfänger": 7,
-    "BIC Empfänger": 8,
-    "Verwendungszweck": 1,
-    "Zahlungsreferenz": 2,
-    "Originalbetrag": 21,
-    "Auftraggeber": 11,
-    "Urspr. Empfänger": 15,
-    "Entgeltzeile": 22,
-    "Empfänger": 5,
-    "Mandat": 3,
-}
-
-
-def parse_command_line_args():
-    """
-    Parse command-line arguments for CSV processing.
-
-    Returns:
-        Parsed arguments containing input_csv and output_csv paths.
-
-    """
-    parser = argparse.ArgumentParser(
-        description="Process an ELBA-generated CSV file and write results to an output CSV file.",
-    )
-
-    parser.add_argument("input_csv", help="Path to the input CSV file.")
-
-    parser.add_argument("output_csv", help="Path to the output CSV file.")
-
-    parser.add_argument(
-        "--merge",
-        help="Merge 'Zahlungsreferenz', 'Verwendungszweck' and 'Auftraggeberreferenz'",
-        action="store_true",
-    )
-
-    return parser.parse_args()
+from .constants import KEYS
 
 
 def parse_key_value_string(s):
@@ -194,19 +141,3 @@ def process_csv_file(input_csv, output_csv, merge):
         writer.writerow([strip_zwnbsp(v) for v in new_header])
         for row in new_rows:
             writer.writerow([strip_zwnbsp(v) for v in row])
-
-
-def main():
-    """
-    Main entry point for the CSV processing script.
-
-    Parses command-line arguments and processes the specified input CSV file,
-    writing the parsed results to the specified output CSV file.
-    """
-    args = parse_command_line_args()
-
-    process_csv_file(args.input_csv, args.output_csv, args.merge)
-
-
-if __name__ == "__main__":
-    main()

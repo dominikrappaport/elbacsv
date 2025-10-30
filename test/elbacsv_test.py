@@ -2,14 +2,9 @@ import csv
 
 import pytest
 
-from elbacsv import (
-    KEYS,
-    main,
-    parse_command_line_args,
-    parse_key_value_string,
-    process_csv_file,
-    strip_zwnbsp,
-)
+from elbacsv import parse_key_value_string, process_csv_file, strip_zwnbsp
+from elbacsv.cli import main, parse_command_line_args
+from elbacsv.constants import KEYS
 
 
 class TestParseKeyValueString:

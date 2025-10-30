@@ -33,22 +33,37 @@ To obtain properly structured data suitable for import into iFinance (or tools s
 
 ## Installation
 
-To use my little tool for yourself you need to clone the repository and install the dependencies.
+Elbacsv is distributed as a Python package. Several installation methods are available.
+
+### Using pip
+
+Executing `pip` installs the package in your current Python environment. Global installation was once possible, but
+modern Linux distributions no longer permit this approach.
 
 ```bash
-git clone https://github.com/dominikrappaport/elbacsv.git
-cd elba-csv-tool
-uv sync
+pip install elbacsv
 ```
 
-These steps assume you are using [uv](https://github.com/astral-sh/uv) as your package and project manager.
+### Using pipx or uv
+
+Both `pipx` and `uv` enable global tool installation. The package can be installed as follows:
+
+```bash
+pipx install elbacsv
+```
+
+or
+
+```bash
+uv tool install elbacsv
+```
 
 ## Usage
 
 Download the CSV file from your bank account and run the following command:
 
 ```bash
-uv run elbacsv.py input.csv output.csv
+elbacsv input.csv output.csv
 ```
 
 You may add the option `--merge`. This will merge the two keys `Verwendungszweck`, `Zahlungsreferenz` and 
