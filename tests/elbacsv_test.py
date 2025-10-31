@@ -386,3 +386,78 @@ class TestMain:
         assert output_file.exists()
         output_content = output_file.read_text(encoding="utf-8")
         assert "REF Test" in output_content
+
+    def test_main_nonexistent_input_file(self, tmp_path, monkeypatch, capsys):
+        """Test that main handles nonexistent input file."""
+        input_file = tmp_path / "nonexistent.csv"
+        output_file = tmp_path / "output.csv"
+
+        monkeypatch.setattr(
+            "sys.argv", ["elbacsv.py", str(input_file), str(output_file)]
+        )
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+        assert exc_info.value.code == 1
+        captured = capsys.readouterr()
+        assert "Error: File not found" in captured.err
+        assert str(input_file) in captured.err
+
+    def test_main_input_file_permission_denied(self, tmp_path, monkeypatch, capsys):
+        """Test that main handles input file with no read permissions."""
+        input_file = tmp_path / "input.csv"
+        output_file = tmp_path / "output.csv"
+
+        # Create a file and remove read permissions
+        input_file.write_text(
+            "2024-01-15,Verwendungszweck: Test,2024-01-15,100.00,EUR,2024-01-15 10:00:00\n",
+            encoding="utf-8",
+        )
+        input_file.chmod(0o000)
+
+        monkeypatch.setattr(
+            "sys.argv", ["elbacsv.py", str(input_file), str(output_file)]
+        )
+
+        try:
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+
+            assert exc_info.value.code == 1
+            captured = capsys.readouterr()
+            assert "Error: Permission denied" in captured.err
+        finally:
+            # Restore permissions for cleanup
+            input_file.chmod(0o644)
+
+    def test_main_output_file_permission_denied(self, tmp_path, monkeypatch, capsys):
+        """Test that main handles output file that can't be written."""
+        input_file = tmp_path / "input.csv"
+        output_dir = tmp_path / "readonly_dir"
+        output_dir.mkdir()
+        output_file = output_dir / "output.csv"
+
+        # Create a valid input file
+        input_file.write_text(
+            "2024-01-15,Verwendungszweck: Test,2024-01-15,100.00,EUR,2024-01-15 10:00:00\n",
+            encoding="utf-8",
+        )
+
+        # Remove write permissions from the output directory
+        output_dir.chmod(0o444)
+
+        monkeypatch.setattr(
+            "sys.argv", ["elbacsv.py", str(input_file), str(output_file)]
+        )
+
+        try:
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+
+            assert exc_info.value.code == 1
+            captured = capsys.readouterr()
+            assert "Error: Permission denied" in captured.err
+        finally:
+            # Restore permissions for cleanup
+            output_dir.chmod(0o755)

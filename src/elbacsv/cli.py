@@ -6,6 +6,7 @@ the main entry point for the CLI tool.
 """
 
 import argparse
+import sys
 
 from .core import process_csv_file
 
@@ -44,7 +45,17 @@ def main():
     """
     args = parse_command_line_args()
 
-    process_csv_file(args.input_csv, args.output_csv, args.merge)
+    try:
+        process_csv_file(args.input_csv, args.output_csv, args.merge)
+    except FileNotFoundError as e:
+        print(f"Error: File not found - {e}", file=sys.stderr)
+        sys.exit(1)
+    except PermissionError as e:
+        print(f"Error: Permission denied - {e}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error: An unexpected error occurred - {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -122,7 +122,7 @@ def process_csv_file(input_csv, output_csv, merge):
             sorted_keys = [
                 k
                 for k in sorted_keys
-                if k not in ["Zahlungsreferenz", "Auftraggeberreferenz"]
+                if k not in {"Zahlungsreferenz", "Auftraggeberreferenz"}
             ]
 
         new_row = (
