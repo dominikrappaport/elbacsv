@@ -12,7 +12,7 @@ from .cli import main, parse_command_line_args
 from .constants import KEYS
 from .core import parse_key_value_string, process_csv_file, strip_zwnbsp
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Dominik Rappaport"
 __email__ = "dominik@rappaport.at"
 __license__ = "MIT"
