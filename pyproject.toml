@@ -1,6 +1,6 @@
 [project]
 name = "elbacsv"
-version = "0.1.0"
+version = "0.1.1"
 description = "Takes CSV files from the ELBA electronic banking application and brings it into first normal form"
 readme = "README.md"
 requires-python = ">=3.10"
